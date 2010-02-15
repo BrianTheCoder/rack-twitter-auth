@@ -148,6 +148,9 @@ module Rack #:nodoc:
     attr_accessor :consumer_site
     alias site  consumer_site
     alias site= consumer_site=
+    
+    # for using "Sign in w/twitter"
+    attr_accessor :authentication
 
     # an arbitrary name for this instance of Rack::OAuth
     def name
@@ -204,7 +207,9 @@ module Rack #:nodoc:
       session(env)[:secret] = request.secret
 
       # redirect to the oauth provider's authorize url to authorize the user
-      [ 302, { 'Content-Type' => 'text/html', 'Location' => request.authorize_url }, [] ]
+      path = request.authorize_url
+      path.gsub!('authorize', 'authenticate') if @authentication
+      [ 302, { 'Content-Type' => 'text/html', 'Location' => path }, [] ]
     end
 
     def do_callback env
