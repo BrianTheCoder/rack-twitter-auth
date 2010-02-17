@@ -98,11 +98,6 @@ Gem::Specification.new do |s|
      "examples/sinatra-twitter.ru",
      "lib/rack-oauth.rb",
      "lib/rack/oauth.rb",
-     "spec/data/authorized_access_token.yml",
-     "spec/data/authorized_oauth_verifier.yml",
-     "spec/data/authorized_request_secret.yml",
-     "spec/data/authorized_request_token.yml",
-     "spec/data/unauthorized_request_token.yml",
      "spec/rack_oauth_middleware_spec.rb",
      "spec/sample_sinatra_app_spec.rb",
      "spec/spec_helper.rb"
