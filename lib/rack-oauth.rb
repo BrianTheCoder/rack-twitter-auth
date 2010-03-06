@@ -64,7 +64,7 @@ module Rack #:nodoc:
 
       # Returns the instance of Rack::OAuth given a name (defaults to the default Rack::OAuth name)
       def oauth_instance name = nil
-        oauth = Rack::OAuth.get(oauth_request_env, nil)
+        oauth = Rack::OAuth.get(oauth_request_env, name)
         raise "Couldn't find Rack::OAuth instance with name #{ name }" unless oauth
         oauth
       end
@@ -122,9 +122,14 @@ module Rack #:nodoc:
     def callback_path
       ::File.join *[@callback_path.to_s, name_unless_default].compact
     end
+    
     attr_writer :callback_path
     alias callback  callback_path
     alias callback= callback_path=
+    
+    def redirect_path
+      ::File.join *[@redirect_to.to_s, name_unless_default].compact
+    end
 
     # the URL that Rack::OAuth should redirect to after the OAuth has been completed (part of your app)
     attr_accessor :redirect_to
@@ -156,6 +161,7 @@ module Rack #:nodoc:
     def name
       @name.to_s
     end
+    
     attr_writer :name
 
     def initialize app, *args
@@ -183,13 +189,11 @@ module Rack #:nodoc:
       # the provider will redirect back to our application's callback path
       when login_path
         do_login(env)
-
       # the oauth provider has redirected back to us!  we should have a 
       # verifier now that we can use, in combination with out token and 
       # secret, to get an access token for this user
       when callback_path
         do_callback(env)
-
       else
         @app.call(env)
       end
@@ -222,7 +226,7 @@ module Rack #:nodoc:
       session(env).delete(:secret)
 
       # we have an access token now ... redirect back to the user's application
-      [ 302, { 'Content-Type' => 'text/html', 'Location' => redirect_to }, [] ]
+      [ 302, { 'Content-Type' => 'text/html', 'Location' => redirect_path }, [] ]
     end
 
     # Stores the access token in this env's session in a way that we can get it back out via #get_access_token(env)
